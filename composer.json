@@ -1,0 +1,93 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "mercado-inmueble/api",
+    "type": "project",
+    "description": "API REST de la plataforma inmobiliaria Mercado Inmueble (Laravel 12 + Passport + Scramble).",
+    "keywords": ["laravel", "api", "rest", "inmobiliaria", "passport", "openapi", "clean-architecture"],
+    "license": "proprietary",
+    "require": {
+        "php": "^8.3",
+        "dedoc/scramble": "^0.13.47",
+        "laravel/framework": "^12.0",
+        "laravel/passport": "^13.0",
+        "laravel/tinker": "^2.10.1",
+        "spatie/laravel-activitylog": "^4.12"
+    },
+    "require-dev": {
+        "fakerphp/faker": "^1.23",
+        "laravel/pail": "^1.2.2",
+        "laravel/pint": "^1.24",
+        "mockery/mockery": "^1.6",
+        "nunomaduro/collision": "^8.6",
+        "phpunit/phpunit": "^11.5.50"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "instalar": [
+            "@php artisan mercado:instalar --force"
+        ],
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan key:generate",
+            "@php artisan mercado:instalar --seed",
+            "@php artisan storage:link"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185\" \"php artisan serve\" \"php artisan queue:listen --tries=1 --timeout=0\" \"php artisan pail --timeout=0\" --names=server,queue,logs --kill-others"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test"
+        ],
+        "lint": [
+            "vendor/bin/pint --test"
+        ],
+        "lint:fix": [
+            "vendor/bin/pint"
+        ],
+        "openapi": [
+            "@php artisan scramble:export --path=openapi.json"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "@php artisan key:generate --ansi"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

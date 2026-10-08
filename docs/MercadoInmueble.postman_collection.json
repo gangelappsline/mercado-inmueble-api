@@ -1,0 +1,2289 @@
+{
+  "info": {
+    "name": "Mercado Inmueble API v1",
+    "description": "Colección de la API REST de Mercado Inmueble (Laravel 12 + Passport).\n\n1. Ejecuta `php artisan mercado:instalar --seed` y `php artisan serve`.\n2. Ejecuta la petición «Login cliente demo»: el script de test guarda `token`.\n3. El resto de peticiones usan `{{token}}` automáticamente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "propiedad_id",
+      "value": "1"
+    },
+    {
+      "key": "interes_id",
+      "value": "1"
+    },
+    {
+      "key": "hilo_id",
+      "value": "1"
+    },
+    {
+      "key": "cita_id",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Autenticación",
+      "item": [
+        {
+          "name": "Registro inmobiliaria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register/inmobiliaria",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                "inmobiliaria"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Inmobiliaria Demo\",\n  \"email\": \"nueva@demo.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"phone\": \"+591 70000000\",\n  \"razon_social\": \"Demo Propiedades S.R.L.\",\n  \"ruc\": \"1023456789\",\n  \"ciudad\": \"La Paz\",\n  \"acepta_terminos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registro vendedor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register/vendedor",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                "vendedor"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Luis Mendoza\",\n  \"email\": \"luis@demo.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"nombres\": \"Luis Alberto\",\n  \"apellidos\": \"Mendoza Vargas\",\n  \"dni\": \"7123456\",\n  \"telefono\": \"+591 71234567\",\n  \"ciudad\": \"La Paz\",\n  \"acepta_terminos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Registro cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/register/cliente",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                "cliente"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ana Torres\",\n  \"email\": \"ana@demo.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"telefono\": \"+591 76543210\",\n  \"ciudad_interes\": \"La Paz\",\n  \"acepta_terminos\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login cliente demo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.tokens) {",
+                  "  pm.collectionVariables.set('token', json.data.tokens.access_token);",
+                  "  console.log('Token guardado en la variable token');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente1@demo.mercadoinmueble.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Guarda el access_token en la variable `token` de la colección."
+          }
+        },
+        {
+          "name": "Perfil autenticado (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Refrescar token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"PEGA_AQUI_EL_REFRESH_TOKEN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cerrar sesión",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Recuperar contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/forgot-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente1@demo.mercadoinmueble.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Restablecer contraseña",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/reset-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente1@demo.mercadoinmueble.com\",\n  \"token\": \"TOKEN_DEL_CORREO\",\n  \"password\": \"NuevaPassword123!\",\n  \"password_confirmation\": \"NuevaPassword123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Catálogo público",
+      "item": [
+        {
+          "name": "Buscar propiedades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/propiedades?ciudad=La Paz&tipo=departamento&operacion=venta&precio_min=40000&precio_max=120000&orden=precio_asc&per_page=12",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "propiedades"
+              ],
+              "query": [
+                {
+                  "key": "ciudad",
+                  "value": "La Paz"
+                },
+                {
+                  "key": "tipo",
+                  "value": "departamento"
+                },
+                {
+                  "key": "operacion",
+                  "value": "venta"
+                },
+                {
+                  "key": "precio_min",
+                  "value": "40000"
+                },
+                {
+                  "key": "precio_max",
+                  "value": "120000"
+                },
+                {
+                  "key": "orden",
+                  "value": "precio_asc"
+                },
+                {
+                  "key": "per_page",
+                  "value": "12"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Buscar por cercanía",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/propiedades?cerca_de=-16.50,-68.15&radio_km=5&orden=distancia",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "propiedades"
+              ],
+              "query": [
+                {
+                  "key": "cerca_de",
+                  "value": "-16.50,-68.15"
+                },
+                {
+                  "key": "radio_km",
+                  "value": "5"
+                },
+                {
+                  "key": "orden",
+                  "value": "distancia"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Destacadas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/propiedades/destacadas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "propiedades",
+                "destacadas"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle de propiedad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Amenidades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/amenidades",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "amenidades"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Ciudades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ciudades",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ciudades"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Opciones de catálogo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/catalogo/opciones",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "catalogo",
+                "opciones"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Inmobiliarias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliarias?verificadas=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliarias"
+              ],
+              "query": [
+                {
+                  "key": "verificadas",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Formulario de contacto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/contacto",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "contacto"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Ana Torres\",\n  \"email\": \"ana@demo.com\",\n  \"telefono\": \"+591 71234567\",\n  \"asunto\": \"Quiero publicar mi propiedad\",\n  \"mensaje\": \"Tengo un departamento para alquilar en Sopocachi y quiero publicarlo.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Panel inmobiliaria",
+      "item": [
+        {
+          "name": "Listar mis propiedades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades?estado=publicada",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "publicada"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle (panel)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Actualizar propiedad",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio\": 92000,\n  \"destacada\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Publicar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}/publicar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}",
+                "publicar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Pausar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}/pausar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}",
+                "pausar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Cerrar operación",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}/cerrar-operacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}",
+                "cerrar-operacion"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"vendida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Estadísticas de la propiedad",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}/estadisticas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}",
+                "estadisticas"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Reordenar fotos",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/propiedades/{{propiedad_id}}/fotos/orden",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "propiedades",
+                "{{propiedad_id}}",
+                "fotos",
+                "orden"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fotos\": [\n    3,\n    2,\n    1\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Interesados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/interesados?solo_nuevos=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "interesados"
+              ],
+              "query": [
+                {
+                  "key": "solo_nuevos",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Responder interesado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/interesados/{{interes_id}}/responder",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "interesados",
+                "{{interes_id}}",
+                "responder"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuerpo\": \"Gracias por tu interés, la propiedad sigue disponible.\",\n  \"cerrar_interes\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cambiar estado del interés",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/interesados/{{interes_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "interesados",
+                "{{interes_id}}",
+                "estado"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"atendido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Bandeja de mensajes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/mensajes?solo_no_leidos=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "mensajes"
+              ],
+              "query": [
+                {
+                  "key": "solo_no_leidos",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle del hilo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/mensajes/{{hilo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "mensajes",
+                "{{hilo_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Responder en el hilo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/mensajes/{{hilo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "mensajes",
+                "{{hilo_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuerpo\": \"Te comparto el plano del departamento.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cerrar hilo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/mensajes/{{hilo_id}}/cerrar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "mensajes",
+                "{{hilo_id}}",
+                "cerrar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mis citas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/citas?estado=pendiente",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "citas"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "pendiente"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Agenda del día",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/citas/agenda?fecha=2025-10-12",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "citas",
+                "agenda"
+              ],
+              "query": [
+                {
+                  "key": "fecha",
+                  "value": "2025-10-12"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Confirmar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/citas/{{cita_id}}/confirmar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "citas",
+                "{{cita_id}}",
+                "confirmar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Reprogramar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/citas/{{cita_id}}/reprogramar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "citas",
+                "{{cita_id}}",
+                "reprogramar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2025-10-15\",\n  \"hora\": \"16:30\",\n  \"motivo\": \"Cambio de agenda\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cancelar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/citas/{{cita_id}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "citas",
+                "{{cita_id}}",
+                "cancelar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"El cliente no podrá asistir\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Completar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/citas/{{cita_id}}/completar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "citas",
+                "{{cita_id}}",
+                "completar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Reporte resumen",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/reportes/resumen?desde=2025-09-01&hasta=2025-09-30",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "reportes",
+                "resumen"
+              ],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2025-09-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2025-09-30"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Propiedades más vistas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/reportes/propiedades-mas-vistas?limite=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "reportes",
+                "propiedades-mas-vistas"
+              ],
+              "query": [
+                {
+                  "key": "limite",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Conversión",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/reportes/conversion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "reportes",
+                "conversion"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Ingresos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/reportes/ingresos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "reportes",
+                "ingresos"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Exportar reporte (csv)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/reportes/exportar?reporte=resumen&formato=csv",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "reportes",
+                "exportar"
+              ],
+              "query": [
+                {
+                  "key": "reporte",
+                  "value": "resumen"
+                },
+                {
+                  "key": "formato",
+                  "value": "csv"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "perfil"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Actualizar perfil",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "perfil"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre_comercial\": \"Urbana Propiedades\",\n  \"telefono\": \"+591 31234567\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Eliminar logotipo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/inmobiliaria/perfil/logo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "inmobiliaria",
+                "perfil",
+                "logo"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Panel vendedor",
+      "item": [
+        {
+          "name": "Listar mis propiedades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/propiedades",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "propiedades"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Actualizar propiedad",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio\": 78000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Publicar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/propiedades/{{propiedad_id}}/publicar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "propiedades",
+                "{{propiedad_id}}",
+                "publicar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mis citas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/citas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "citas"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Interesados",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/interesados",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "interesados"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Bandeja de mensajes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/mensajes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "mensajes"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Reporte resumen",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/reportes/resumen",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "reportes",
+                "resumen"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendedor/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendedor",
+                "perfil"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Panel cliente",
+      "item": [
+        {
+          "name": "Búsqueda personalizada",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/propiedades?per_page=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "propiedades"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Guardar favorito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/favoritos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "favoritos"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"propiedad_id\": 1,\n  \"nota\": \"Comparar con la casa de Calacoto\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mis favoritos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/favoritos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "favoritos"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Nota del favorito",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/favoritos/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "favoritos",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nota\": \"Llamar el lunes\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Quitar favorito",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/favoritos/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "favoritos",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Registrar interés",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/propiedades/{{propiedad_id}}/interes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "propiedades",
+                "{{propiedad_id}}",
+                "interes"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mensaje\": \"Hola, me interesa la propiedad. ¿Sigue disponible?\",\n  \"preferencia_contacto\": \"whatsapp\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mis intereses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/intereses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "intereses"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle del interés",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/intereses/{{interes_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "intereses",
+                "{{interes_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Mis mensajes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/mensajes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "mensajes"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Responder en el hilo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/mensajes/{{hilo_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "mensajes",
+                "{{hilo_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cuerpo\": \"¿Podemos visitarla el sábado?\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Solicitar cita",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/propiedades/{{propiedad_id}}/citas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "propiedades",
+                "{{propiedad_id}}",
+                "citas"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2025-10-20\",\n  \"hora\": \"10:00\",\n  \"tipo\": \"visita\",\n  \"lugar\": \"Av. Arce #2450, La Paz\",\n  \"duracion_minutos\": 45\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mis citas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/citas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "citas"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Reprogramar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/citas/{{cita_id}}/reprogramar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "citas",
+                "{{cita_id}}",
+                "reprogramar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fecha\": \"2025-10-22\",\n  \"hora\": \"15:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cancelar cita",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/citas/{{cita_id}}/cancelar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "citas",
+                "{{cita_id}}",
+                "cancelar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Me surgió un viaje\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "perfil"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Actualizar preferencias",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cliente/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cliente",
+                "perfil"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"presupuesto_min\": 60000,\n  \"presupuesto_max\": 120000,\n  \"ciudad_interes\": \"La Paz\",\n  \"habitaciones_min\": 2,\n  \"recibe_novedades\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Archivos firmados",
+      "item": [
+        {
+          "name": "Descargar video (URL firmada)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/media/videos/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "media",
+                "videos",
+                "1"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Descargar adjunto (URL firmada)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/media/adjuntos/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "media",
+                "adjuntos",
+                "1"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    }
+  ]
+}
