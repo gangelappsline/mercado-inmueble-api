@@ -28,7 +28,7 @@ return [
         'store' => 'file',
     ],
 
-    'openapi_version' => \Dedoc\Scramble\OpenApiVersion::V3_1,
+    //'openapi_version' => \Dedoc\Scramble\OpenApiVersion::V3_1,
 
     'info' => [
         'version' => env('APP_VERSION', '1.0.0'),

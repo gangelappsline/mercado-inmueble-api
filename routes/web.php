@@ -13,12 +13,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', static function (): array {
+    return 'Hola';
     return [
         'aplicacion' => config('app.name'),
         'version' => 'v1',
         'api' => url('/api/v1'),
         'documentacion' => url('/docs/api'),
-        'contrato_openapi' => url('/openapi.json'),
         'salud' => url('/up'),
     ];
 })->name('inicio');

@@ -6,7 +6,7 @@
     "keywords": ["laravel", "api", "rest", "inmobiliaria", "passport", "openapi", "clean-architecture"],
     "license": "proprietary",
     "require": {
-        "php": "^8.3",
+        "php": "^8.2.12",
         "dedoc/scramble": "^0.13.47",
         "laravel/framework": "^12.0",
         "laravel/passport": "^13.0",

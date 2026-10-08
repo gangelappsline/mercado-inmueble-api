@@ -78,7 +78,7 @@ class AmenidadSeeder extends Seeder
 
         foreach (self::CATALOGO as $categoria => $amenidades) {
             foreach ($amenidades as $nombre => $icono) {
-                Amenidad::withTrashed()->updateOrCreate(
+                Amenidad::updateOrCreate(
                     ['slug' => Str::slug($nombre)],
                     [
                         'nombre' => $nombre,
