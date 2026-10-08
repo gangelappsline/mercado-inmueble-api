@@ -23,8 +23,6 @@ class IndexPropiedadRequest extends ApiFormRequest
      */
     public function rules(): array
     {
-        $hoy = now()->toDateString();
-
         return [
             'q' => ['nullable', 'string', 'min:2', 'max:120'],
             'tipo' => ['nullable', Rule::enum(TipoPropiedad::class)],
@@ -53,7 +51,6 @@ class IndexPropiedadRequest extends ApiFormRequest
             'orden' => ['nullable', Rule::in(['recientes', 'antiguas', 'precio_asc', 'precio_desc', 'area_desc', 'vistas', 'relevancia', 'distancia'])],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:'.(int) config('mercado.paginacion.maxima', 100)],
-            '_' => ['nullable', 'string', 'max:40', 'date_format:Y-m-d', 'before_or_equal:'.$hoy],
         ];
     }
 
@@ -79,7 +76,7 @@ class IndexPropiedadRequest extends ApiFormRequest
     public function filtros(): array
     {
         return collect($this->validated())
-            ->except(['page', 'per_page', '_'])
+            ->except(['page', 'per_page'])
             ->reject(static fn (mixed $valor): bool => $valor === null || $valor === '' || $valor === [])
             ->all();
     }

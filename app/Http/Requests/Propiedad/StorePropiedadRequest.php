@@ -33,7 +33,7 @@ class StorePropiedadRequest extends ApiFormRequest
             'moneda' => ['required', Rule::enum(Moneda::class)],
             'expensas' => ['nullable', 'numeric', 'min:0'],
             'precio_negociable' => ['nullable', 'boolean'],
-            'destacada' => ['nullable', 'boolean', Rule::prohibitedIf(fn (): bool => $this->user()?->esVendedor() ?? false)],
+            'destacada' => ['nullable', 'boolean'],
 
             // Superficies y ambientes
             'area_total' => ['required', 'numeric', 'min:1', 'max:1000000'],
@@ -76,7 +76,6 @@ class StorePropiedadRequest extends ApiFormRequest
             'area_construida.lte' => 'El área construida no puede superar el área total.',
             'fotos.*.max' => 'Cada foto puede pesar como máximo :max KB.',
             'video.max' => 'El video no puede superar el tamaño máximo permitido.',
-            'destacada.prohibited' => 'Sólo las inmobiliarias pueden destacar publicaciones.',
             'latitud.required_with' => 'Debes enviar latitud y longitud juntas.',
         ];
     }
@@ -88,11 +87,18 @@ class StorePropiedadRequest extends ApiFormRequest
      */
     public function datosDeLaPropiedad(): array
     {
-        return $this->datosValidados([
+        $datos = $this->datosValidados([
             'titulo', 'descripcion', 'tipo', 'operacion', 'precio', 'moneda', 'expensas',
             'precio_negociable', 'destacada', 'area_total', 'area_construida', 'habitaciones',
             'banos', 'estacionamientos', 'piso', 'anio_construccion', 'amoblado', 'direccion',
             'ciudad', 'estado_provincia', 'pais', 'codigo_postal', 'latitud', 'longitud',
-        ]) + ['amenidades' => $this->input('amenidades', [])];
+        ]);
+
+        // El destacado es exclusivo de las inmobiliarias: se ignora para el resto.
+        if (! ($this->user()?->esInmobiliaria() ?? false)) {
+            unset($datos['destacada']);
+        }
+
+        return $datos + ['amenidades' => $this->input('amenidades', [])];
     }
 }

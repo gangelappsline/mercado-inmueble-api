@@ -34,7 +34,7 @@ class UpdatePropiedadRequest extends ApiFormRequest
             'moneda' => ['sometimes', Rule::enum(Moneda::class)],
             'expensas' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'precio_negociable' => ['sometimes', 'boolean'],
-            'destacada' => ['sometimes', 'boolean', Rule::prohibitedIf(fn (): bool => $this->user()?->esVendedor() ?? false)],
+            'destacada' => ['sometimes', 'boolean'],
 
             'area_total' => ['sometimes', 'numeric', 'min:1'],
             'area_construida' => ['sometimes', 'nullable', 'numeric', 'min:0'],
@@ -75,6 +75,13 @@ class UpdatePropiedadRequest extends ApiFormRequest
      */
     public function datosDeLaPropiedad(): array
     {
-        return $this->validated();
+        $datos = $this->validated();
+
+        // El destacado es exclusivo de las inmobiliarias: se ignora para el resto.
+        if (! ($this->user()?->esInmobiliaria() ?? false)) {
+            unset($datos['destacada']);
+        }
+
+        return $datos;
     }
 }
