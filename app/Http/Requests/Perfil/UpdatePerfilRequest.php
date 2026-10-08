@@ -12,7 +12,8 @@ use Illuminate\Validation\Rule;
 
 /**
  * Actualización del perfil propio. Las reglas se resuelven según el rol del
- * usuario autenticado (inmobiliaria, vendedor o cliente).
+ * usuario autenticado (inmobiliaria, vendedor o cliente). El rol
+ * `administrador` no tiene perfil extendido: sólo acepta los campos comunes.
  */
 class UpdatePerfilRequest extends ApiFormRequest
 {

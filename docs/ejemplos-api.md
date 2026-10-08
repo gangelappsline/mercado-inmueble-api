@@ -355,7 +355,132 @@ curl -X PATCH http://localhost:8000/api/v1/cliente/perfil \
 
 ---
 
-## 5. Archivos privados (URLs firmadas)
+## 5. Panel de administración
+
+Requiere una cuenta con rol `administrador`. Estas cuentas **no** se crean por el
+registro público: usa `php artisan mercado:instalar`, `php artisan mercado:crear-admin {correo}`
+u otro administrador desde `POST /admin/usuarios`.
+
+```bash
+# Login de un agente (scope `administrador`)
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Accept: application/json" -H "Content-Type: application/json" \
+  -d '{"email": "admin@demo.mercadoinmueble.com", "password": "Password123!"}'
+```
+
+### Dashboard y perfil del agente
+
+```bash
+curl http://localhost:8000/api/v1/admin/dashboard -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8000/api/v1/admin/perfil    -H "Authorization: Bearer $TOKEN"
+```
+
+```json
+{
+  "success": true,
+  "message": "Operación exitosa.",
+  "data": {
+    "usuarios": { "total": 18, "activos": 18, "inactivos": 0, "nuevos_30_dias": 18,
+                  "por_rol": { "inmobiliaria": 5, "vendedor": 3, "cliente": 10, "administrador": 2 } },
+    "inmobiliarias": { "total": 5, "verificadas": 3, "pendientes_de_verificacion": 2 },
+    "vendedores": { "total": 3, "verificados": 2, "pendientes_de_verificacion": 1 },
+    "clientes": { "total": 10 },
+    "propiedades": { "borrador": 4, "publicada": 18, "pausada": 2, "vendida": 1,
+                     "alquilada": 1, "rechazada": 0, "total": 26, "destacadas": 6 },
+    "actividad": { "vistas": 6420, "intereses": 14, "citas": 9, "mensajes": 31, "favoritos": 12 },
+    "contactos": { "total": 4, "pendientes": 2 },
+    "ingresos": { "comision_porcentaje": 3.0,
+                  "por_moneda": [{ "moneda": "USD", "operaciones": 2, "volumen": 285000, "comision_estimada": 8550 }] },
+    "administradores_activos": 2,
+    "generado_en": "2026-10-08T16:20:31-04:00"
+  }
+}
+```
+
+### Cuentas: alta, edición, suspensión y roles
+
+```bash
+# Listado global con filtros (q, role, activo, rol_excluido)
+curl "http://localhost:8000/api/v1/admin/usuarios?role=inmobiliaria&activo=false" -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8000/api/v1/admin/usuarios/12 -H "Authorization: Bearer $TOKEN"
+
+# Alta de otro agente (el rol administrador no tiene perfil extendido)
+curl -X POST http://localhost:8000/api/v1/admin/usuarios \
+  -H "Accept: application/json" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"role": "administrador", "name": "Nuevo Agente", "email": "agente2@mercadoinmueble.com",
+       "password": "Password123!", "password_confirmation": "Password123!", "phone": "+591 70012345"}'
+
+# Alta de una inmobiliaria: el cuerpo coincide con el registro público de ese rol
+curl -X POST http://localhost:8000/api/v1/admin/usuarios \
+  -H "Accept: application/json" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"role": "inmobiliaria", "name": "Responsable", "email": "alta@demo.test",
+       "password": "Password123!", "password_confirmation": "Password123!",
+       "razon_social": "Nueva Propiedades S.R.L.", "ruc": "1099887766",
+       "ciudad": "La Paz", "estado_provincia": "La Paz"}'
+
+# Edición, suspensión, reactivación, cambio de rol y baja
+curl -X PATCH http://localhost:8000/api/v1/admin/usuarios/12 \
+  -H "Accept: application/json" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"name": "Nombre corregido", "phone": "+591 60000001"}'
+
+curl -X PATCH http://localhost:8000/api/v1/admin/usuarios/12/desactivar -H "Authorization: Bearer $TOKEN"
+curl -X PATCH http://localhost:8000/api/v1/admin/usuarios/12/activar    -H "Authorization: Bearer $TOKEN"
+curl -X PATCH http://localhost:8000/api/v1/admin/usuarios/12/rol \
+  -H "Accept: application/json" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"role": "administrador"}'
+curl -X DELETE http://localhost:8000/api/v1/admin/usuarios/12 -H "Authorization: Bearer $TOKEN"
+curl -X PATCH  http://localhost:8000/api/v1/admin/usuarios/12/restaurar -H "Authorization: Bearer $TOKEN"
+```
+
+> Al suspender una cuenta o cambiar su rol se revocan todos sus tokens. Ninguna acción se aplica
+> sobre la cuenta del propio agente (403) y siempre debe quedar al menos un administrador activo
+> (409 `ULTIMO_ADMINISTRADOR`).
+
+### Anunciantes: verificación
+
+```bash
+curl "http://localhost:8000/api/v1/admin/inmobiliarias?verificado=false&ciudad=La%20Paz" -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8000/api/v1/admin/inmobiliarias/3 -H "Authorization: Bearer $TOKEN"
+curl -X POST   http://localhost:8000/api/v1/admin/inmobiliarias/3/verificar -H "Authorization: Bearer $TOKEN"
+curl -X DELETE http://localhost:8000/api/v1/admin/inmobiliarias/3/verificar -H "Authorization: Bearer $TOKEN"
+
+curl "http://localhost:8000/api/v1/admin/vendedores?q=quiroga" -H "Authorization: Bearer $TOKEN"
+curl -X POST http://localhost:8000/api/v1/admin/vendedores/2/verificar -H "Authorization: Bearer $TOKEN"
+```
+
+### Moderación del catálogo
+
+```bash
+# Todo el catálogo, incluidos borradores y rechazadas
+curl "http://localhost:8000/api/v1/admin/propiedades?estado=publicada&propietario_tipo=inmobiliaria&propietario_id=3" \
+  -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8000/api/v1/admin/propiedades/27 -H "Authorization: Bearer $TOKEN"
+
+curl -X POST   http://localhost:8000/api/v1/admin/propiedades/27/destacar -H "Authorization: Bearer $TOKEN"
+curl -X DELETE http://localhost:8000/api/v1/admin/propiedades/27/destacar -H "Authorization: Bearer $TOKEN"
+curl -X POST   http://localhost:8000/api/v1/admin/propiedades/27/pausar   -H "Authorization: Bearer $TOKEN"
+curl -X POST   http://localhost:8000/api/v1/admin/propiedades/27/publicar -H "Authorization: Bearer $TOKEN"
+curl -X POST   http://localhost:8000/api/v1/admin/propiedades/27/rechazar \
+  -H "Accept: application/json" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"motivo": "Las fotografías corresponden a otro inmueble"}'
+curl -X DELETE http://localhost:8000/api/v1/admin/propiedades/27 -H "Authorization: Bearer $TOKEN"
+curl -X PATCH  http://localhost:8000/api/v1/admin/propiedades/27/restaurar -H "Authorization: Bearer $TOKEN"
+```
+
+### Bandeja de contacto y bitácora
+
+```bash
+curl "http://localhost:8000/api/v1/admin/contactos?atendido=false" -H "Authorization: Bearer $TOKEN"
+curl -X PATCH http://localhost:8000/api/v1/admin/contactos/4/atender -H "Authorization: Bearer $TOKEN"
+curl -X DELETE http://localhost:8000/api/v1/admin/contactos/4 -H "Authorization: Bearer $TOKEN"
+
+curl "http://localhost:8000/api/v1/admin/actividad?event=cuenta_suspendida&desde=2026-10-01" -H "Authorization: Bearer $TOKEN"
+curl http://localhost:8000/api/v1/admin/actividad/128 -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
+## 6. Archivos privados (URLs firmadas)
 
 Los videos y los adjuntos de mensajes viven en un disk privado. El recurso
 devuelve una URL firmada temporal (30 minutos por defecto):
@@ -376,7 +501,7 @@ curl -OJ "http://localhost:8000/api/v1/media/videos/7?expires=1760000000&signatu
 
 ---
 
-## 6. Códigos de error
+## 7. Códigos de error
 
 | Código | HTTP | Cuándo ocurre |
 | --- | --- | --- |
@@ -387,4 +512,9 @@ curl -OJ "http://localhost:8000/api/v1/media/videos/7?expires=1760000000&signatu
 | `METHOD_NOT_ALLOWED` | 405 | Verbo HTTP incorrecto |
 | `TOO_MANY_REQUESTS` | 429 | Límite por rol o de endpoint (`meta.retry_after`) |
 | `REGLA_DE_NEGOCIO` | 422/409 | Reglas del dominio (duplicados, estados, solapamientos) |
+| `ROL_INVALIDO` | 404 | Rol inexistente en `POST /auth/register/{rol}` |
+| `ROL_NO_REGISTRABLE` | 403 | El rol (p. ej. `administrador`) no admite registro público |
+| `ULTIMO_ADMINISTRADOR` | 409 | La acción dejaría la plataforma sin administradores activos |
+| `PERFIL_INCOMPATIBLE` | 409 | El cambio de rol exige un perfil extendido que la cuenta no tiene |
+| `ROL_SIN_CAMBIO` | 409 | La cuenta ya tiene el rol solicitado |
 | `SERVER_ERROR` | 500 | Error inesperado (detalle sólo si `APP_DEBUG=true`) |

@@ -103,6 +103,7 @@ final class AppServiceProvider extends ServiceProvider
         // Límite principal de la API (grupo `api` → throttle:api).
         RateLimiter::for('api', static function (Request $request) use ($limites): Limit {
             $porMinuto = match ($request->user()?->role) {
+                Role::Administrador => $limites['administrador'],
                 Role::Inmobiliaria => $limites['inmobiliaria'],
                 Role::Vendedor => $limites['vendedor'],
                 Role::Cliente => $limites['cliente'],

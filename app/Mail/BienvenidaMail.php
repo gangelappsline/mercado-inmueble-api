@@ -49,6 +49,7 @@ class BienvenidaMail extends BaseMailable
             \App\Enums\Role::Inmobiliaria => 'Tu cuenta de inmobiliaria está lista: publica propiedades, gestiona tu agenda y responde a los interesados desde el panel.',
             \App\Enums\Role::Vendedor => 'Tu cuenta de vendedor está lista: publica tus propiedades y recibe consultas de clientes interesados.',
             \App\Enums\Role::Cliente => 'Tu cuenta está lista: guarda tus propiedades favoritas y solicita visitas cuando quieras.',
+            \App\Enums\Role::Administrador => 'Tu cuenta de administrador está lista: gestiona inmobiliarias, vendedores, clientes y la moderación de publicaciones desde el panel de administración.',
         };
     }
 

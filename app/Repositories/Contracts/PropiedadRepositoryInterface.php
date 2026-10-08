@@ -34,6 +34,15 @@ interface PropiedadRepositoryInterface
     public function listarParaPropietario(Model $propietario, array $filtros = [], int $porPagina = 15): LengthAwarePaginator;
 
     /**
+     * Moderación: todas las publicaciones de la plataforma, sin filtrar por
+     * visibilidad pública (panel de administración).
+     *
+     * @param  array<string, mixed>  $filtros
+     * @return LengthAwarePaginator<int, Propiedad>
+     */
+    public function listarParaAdministracion(array $filtros = [], int $porPagina = 15): LengthAwarePaginator;
+
+    /**
      * Últimas publicaciones destacadas/publicadas para la portada.
      *
      * @return Collection<int, Propiedad>
@@ -58,6 +67,13 @@ interface PropiedadRepositoryInterface
      * @return array<string, int>
      */
     public function resumenPorEstado(Model $propietario): array;
+
+    /**
+     * Resumen global de publicaciones por estado (dashboard de administración).
+     *
+     * @return array<string, int>
+     */
+    public function resumenGlobalPorEstado(): array;
 
     /**
      * Ciudades distintas con publicaciones (usado por GET /ciudades).

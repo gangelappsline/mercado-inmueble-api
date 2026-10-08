@@ -38,6 +38,26 @@
     {
       "key": "cita_id",
       "value": "1"
+    },
+    {
+      "key": "usuario_id",
+      "value": "1"
+    },
+    {
+      "key": "inmobiliaria_id",
+      "value": "1"
+    },
+    {
+      "key": "vendedor_id",
+      "value": "1"
+    },
+    {
+      "key": "contacto_id",
+      "value": "1"
+    },
+    {
+      "key": "actividad_id",
+      "value": "1"
     }
   ],
   "item": [
@@ -2284,6 +2304,998 @@
           }
         }
       ]
+    },
+    {
+      "name": "7. Panel administración",
+      "item": [
+        {
+          "name": "Dashboard (métricas globales)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "dashboard"
+              ]
+            },
+            "description": "Cuentas por rol, anunciantes pendientes de verificación, catálogo por estado, actividad de 30 días y comisión estimada."
+          }
+        },
+        {
+          "name": "Perfil del agente y permisos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "perfil"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Actualizar mi perfil",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/perfil",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "perfil"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Valeria Montaño\",\n  \"phone\": \"+591 70000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Listar cuentas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios?role=inmobiliaria&activo=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "inmobiliaria"
+                },
+                {
+                  "key": "activo",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Filtros: q, role, activo, rol_excluido, page, per_page."
+          }
+        },
+        {
+          "name": "Crear administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios"
+              ]
+            },
+            "description": "El rol administrador no admite registro público: sólo se crea desde aquí o con mercado:crear-admin.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"administrador\",\n  \"name\": \"Nuevo Agente\",\n  \"email\": \"agente2@mercadoinmueble.com\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"phone\": \"+591 70012345\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Crear inmobiliaria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios"
+              ]
+            },
+            "description": "El cuerpo coincide con el del registro público del rol elegido.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"inmobiliaria\",\n  \"name\": \"Responsable\",\n  \"email\": \"alta@demo.test\",\n  \"password\": \"Password123!\",\n  \"password_confirmation\": \"Password123!\",\n  \"razon_social\": \"Nueva Propiedades S.R.L.\",\n  \"ruc\": \"1099887766\",\n  \"ciudad\": \"La Paz\",\n  \"estado_provincia\": \"La Paz\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Detalle de cuenta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Editar cuenta",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nombre corregido\",\n  \"phone\": \"+591 60000001\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cambiar rol",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}/rol",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}",
+                "rol"
+              ]
+            },
+            "description": "Revoca los tokens de la cuenta. 409 PERFIL_INCOMPATIBLE si el rol destino exige un perfil que la cuenta no tiene.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"administrador\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Suspender cuenta",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}/desactivar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}",
+                "desactivar"
+              ]
+            },
+            "description": "Revoca todas las sesiones. 409 ULTIMO_ADMINISTRADOR si dejaría la plataforma sin administradores activos."
+          }
+        },
+        {
+          "name": "Reactivar cuenta",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}/activar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}",
+                "activar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Dar de baja",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Restaurar cuenta",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/usuarios/{{usuario_id}}/restaurar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "usuarios",
+                "{{usuario_id}}",
+                "restaurar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Listar inmobiliarias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/inmobiliarias?verificado=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "inmobiliarias"
+              ],
+              "query": [
+                {
+                  "key": "verificado",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle de inmobiliaria",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/inmobiliarias/{{inmobiliaria_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "inmobiliarias",
+                "{{inmobiliaria_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Verificar inmobiliaria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/inmobiliarias/{{inmobiliaria_id}}/verificar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "inmobiliarias",
+                "{{inmobiliaria_id}}",
+                "verificar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Retirar verificación",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/inmobiliarias/{{inmobiliaria_id}}/verificar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "inmobiliarias",
+                "{{inmobiliaria_id}}",
+                "verificar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Listar vendedores",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/vendedores?q=quiroga",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "vendedores"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "quiroga"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle de vendedor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/vendedores/{{vendedor_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "vendedores",
+                "{{vendedor_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Verificar vendedor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/vendedores/{{vendedor_id}}/verificar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "vendedores",
+                "{{vendedor_id}}",
+                "verificar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Retirar verificación",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/vendedores/{{vendedor_id}}/verificar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "vendedores",
+                "{{vendedor_id}}",
+                "verificar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Moderación: listar catálogo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades?estado=publicada",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "publicada"
+                }
+              ]
+            },
+            "description": "Incluye borradores, pausadas y rechazadas de todos los anunciantes."
+          }
+        },
+        {
+          "name": "Moderación: detalle",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Destacar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}/destacar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}",
+                "destacar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Retirar destacado",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}/destacar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}",
+                "destacar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Publicar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}/publicar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}",
+                "publicar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Pausar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}/pausar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}",
+                "pausar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Rechazar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}/rechazar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}",
+                "rechazar"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"motivo\": \"Las fotografías corresponden a otro inmueble\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Dar de baja",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Restaurar publicación",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/propiedades/{{propiedad_id}}/restaurar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "propiedades",
+                "{{propiedad_id}}",
+                "restaurar"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Bandeja de contacto",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/contactos?atendido=false",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "contactos"
+              ],
+              "query": [
+                {
+                  "key": "atendido",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Detalle de contacto",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/contactos/{{contacto_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "contactos",
+                "{{contacto_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Marcar atendido",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/contactos/{{contacto_id}}/atender",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "contactos",
+                "{{contacto_id}}",
+                "atender"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Eliminar contacto",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/contactos/{{contacto_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "contactos",
+                "{{contacto_id}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "Bitácora de auditoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/actividad?desde=2026-10-01",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "actividad"
+              ],
+              "query": [
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                }
+              ]
+            },
+            "description": "Filtros: q, log_name, event, subject_type, subject_id, causer_id, desde, hasta."
+          }
+        },
+        {
+          "name": "Detalle de auditoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/actividad/{{actividad_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "admin",
+                "actividad",
+                "{{actividad_id}}"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ],
+      "description": "Requiere el rol `administrador`. Gestiona cuentas, anunciantes, moderación del catálogo, contactos y auditoría."
     }
   ]
 }

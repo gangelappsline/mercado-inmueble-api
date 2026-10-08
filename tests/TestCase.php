@@ -46,6 +46,7 @@ abstract class TestCase extends BaseTestCase
     protected function usuario(Role $rol): User
     {
         return match ($rol) {
+            Role::Administrador => User::factory()->administrador()->create(),
             Role::Inmobiliaria => User::factory()->inmobiliaria()->create(),
             Role::Vendedor => User::factory()->vendedor()->create(),
             Role::Cliente => User::factory()->cliente()->create(),

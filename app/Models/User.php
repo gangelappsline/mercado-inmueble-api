@@ -20,7 +20,9 @@ use Laravel\Passport\HasApiTokens;
 
 /**
  * Cuenta de acceso a la plataforma. Cada usuario tiene un rol y un perfil
- * extendido asociado polimórficamente (`perfil`): Inmobiliaria, Vendedor o Cliente.
+ * extendido asociado polimórficamente (`perfil`): Inmobiliaria, Vendedor o
+ * Cliente. Las cuentas con rol `administrador` no tienen perfil extendido
+ * (`perfil_type`/`perfil_id` quedan en null): operan el panel de gestión.
  *
  * @property Role $role
  * @property-read Inmobiliaria|Vendedor|Cliente|null $perfil
@@ -159,6 +161,17 @@ class User extends Authenticatable
         return $query->where('role', $rol instanceof Role ? $rol->value : $rol);
     }
 
+    /**
+     * Cuentas del equipo de administración (agentes y administradores).
+     *
+     * @param  Builder<User>  $query
+     * @return Builder<User>
+     */
+    public function scopeAdministradores(Builder $query): Builder
+    {
+        return $query->deRol(Role::Administrador);
+    }
+
     // ─────────────────────────────────────────────────────────────────────
     // Comportamiento
     // ─────────────────────────────────────────────────────────────────────
@@ -206,6 +219,41 @@ class User extends Authenticatable
     }
 
     /**
+     * ¿La cuenta pertenece al equipo de administración de la plataforma?
+     */
+    public function esAdministrador(): bool
+    {
+        return $this->role === Role::Administrador;
+    }
+
+    /**
+     * ¿La cuenta es un anunciante (inmobiliaria o vendedor)?
+     */
+    public function esAnunciante(): bool
+    {
+        return $this->role->esAnunciante();
+    }
+
+    /**
+     * ¿El perfil extendido vinculado corresponde al rol indicado?
+     *
+     * Se usa al reasignar roles desde el panel de administración: un usuario
+     * sólo puede cambiar a un rol cuyo perfil extendido ya posee (o a
+     * `administrador`, que no requiere perfil).
+     */
+    public function perfilCoincideCon(Role $rol): bool
+    {
+        $perfil = $this->relationLoaded('perfil') ? $this->perfil : $this->perfil()->first();
+
+        return match ($rol) {
+            Role::Administrador => true,
+            Role::Inmobiliaria => $perfil instanceof Inmobiliaria,
+            Role::Vendedor => $perfil instanceof Vendedor,
+            Role::Cliente => $perfil instanceof Cliente,
+        };
+    }
+
+    /**
      * Verifica si el rol puede publicar propiedades.
      */
     public function publicaPropiedades(): bool
@@ -214,7 +262,8 @@ class User extends Authenticatable
     }
 
     /**
-     * Perfil que actúa como propietario de propiedades (null para clientes).
+     * Perfil que actúa como propietario de propiedades
+     * (null para clientes y administradores).
      */
     public function propietario(): Inmobiliaria|Vendedor|null
     {

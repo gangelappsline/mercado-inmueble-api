@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Enums\Role;
+use App\Exceptions\BusinessException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ApiFormRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
@@ -25,7 +26,9 @@ use Illuminate\Http\Request;
  * Autenticación OAuth2 (Passport) y gestión de la sesión.
  *
  * El registro es polimórfico: `POST /auth/register/{rol}` crea la cuenta y su
- * perfil extendido (inmobiliaria, vendedor o cliente) en una transacción.
+ * perfil extendido (inmobiliaria, vendedor o cliente) en una transacción. Las
+ * cuentas de administrador nunca se crean por esta vía: las gestiona el panel
+ * `/api/v1/admin/*` (o el comando `mercado:crear-admin`).
  */
 class AuthController extends Controller
 {
@@ -43,6 +46,10 @@ class AuthController extends Controller
 
         if ($enum === null) {
             return ApiResponse::error(__('messages.rol_no_autorizado'), 404, 'ROL_INVALIDO');
+        }
+
+        if (! $enum->permiteRegistroPublico()) {
+            return ApiResponse::error(__('messages.rol_no_registrable'), 403, 'ROL_NO_REGISTRABLE');
         }
 
         $formulario = $this->formularioDeRegistro($request, $enum);
@@ -144,6 +151,8 @@ class AuthController extends Controller
 
     /**
      * Resuelve el Form Request del rol recibido en la URL.
+     *
+     * @throws BusinessException El rol administrador no admite registro público.
      */
     private function formularioDeRegistro(Request $request, Role $rol): ApiFormRequest
     {
@@ -151,6 +160,12 @@ class AuthController extends Controller
             Role::Inmobiliaria => RegisterInmobiliariaRequest::class,
             Role::Vendedor => RegisterVendedorRequest::class,
             Role::Cliente => RegisterClienteRequest::class,
+            Role::Administrador => throw new BusinessException(
+                __('messages.rol_no_registrable'),
+                [],
+                403,
+                'ROL_NO_REGISTRABLE',
+            ),
         };
 
         /** @var ApiFormRequest $formulario */

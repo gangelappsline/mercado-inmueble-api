@@ -9,8 +9,9 @@ use Illuminate\Database\Seeder;
 /**
  * Seeder principal: `php artisan db:seed` (o `migrate:fresh --seed`).
  *
- * Crea catálogos, cuentas demo de los tres roles, 26 propiedades con medios y
- * actividad comercial (intereses, mensajes, citas, favoritos y reportes).
+ * Crea catálogos, cuentas demo de los cuatro roles (administración,
+ * inmobiliaria, vendedor y cliente), 26 propiedades con medios y actividad
+ * comercial (intereses, mensajes, citas, favoritos y reportes).
  * Nunca se ejecuta en producción.
  */
 class DatabaseSeeder extends Seeder
@@ -28,6 +29,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             AmenidadSeeder::class,
+            AdminSeeder::class,
             InmobiliariaSeeder::class,
             VendedorSeeder::class,
             ClienteSeeder::class,

@@ -55,35 +55,35 @@ class VendedorSeeder extends Seeder
     public function run(): void
     {
         foreach (self::VENDEDORES as $indice => $datos) {
-            $user = User::withTrashed()->updateOrCreate(
-                ['email' => $datos['email']],
-                [
-                    'name' => $datos['nombres'].' '.$datos['apellidos'],
-                    'password' => Hash::make(UserFactory::passwordDemo()),
-                    'role' => Role::Vendedor,
-                    'phone' => sprintf('+591 6%06d', 300000 + $indice),
-                    'is_active' => true,
-                    'email_verified_at' => now(),
-                    'deleted_at' => null,
-                ],
-            );
+            $user = User::withTrashed()->firstOrNew(['email' => $datos['email']]);
 
-            $vendedor = Vendedor::withTrashed()->updateOrCreate(
-                ['dni' => sprintf('%07d', 7000000 + $indice)],
-                [
-                    'user_id' => $user->getKey(),
-                    'nombres' => $datos['nombres'],
-                    'apellidos' => $datos['apellidos'],
-                    'telefono' => sprintf('+591 6%06d', 300000 + $indice),
-                    'direccion' => 'Calle '.$indice.' #'.(50 + $indice),
-                    'ciudad' => $datos['ciudad'],
-                    'estado_provincia' => $datos['estado_provincia'],
-                    'fecha_nacimiento' => now()->subYears(35 + $indice)->subDays(11)->toDateString(),
-                    'biografia' => $datos['biografia'],
-                    'verificado' => $indice !== 1,
-                    'deleted_at' => null,
-                ],
-            );
+            // `forceFill`: email_verified_at y deleted_at no son fillable y la
+            // app evita el descarte silencioso de atributos.
+            $user->forceFill([
+                'name' => $datos['nombres'].' '.$datos['apellidos'],
+                'password' => Hash::make(UserFactory::passwordDemo()),
+                'role' => Role::Vendedor,
+                'phone' => sprintf('+591 6%06d', 300000 + $indice),
+                'is_active' => true,
+                'email_verified_at' => now(),
+                'deleted_at' => null,
+            ])->save();
+
+            $vendedor = Vendedor::withTrashed()->firstOrNew(['dni' => sprintf('%07d', 7000000 + $indice)]);
+
+            $vendedor->forceFill([
+                'user_id' => $user->getKey(),
+                'nombres' => $datos['nombres'],
+                'apellidos' => $datos['apellidos'],
+                'telefono' => sprintf('+591 6%06d', 300000 + $indice),
+                'direccion' => 'Calle '.$indice.' #'.(50 + $indice),
+                'ciudad' => $datos['ciudad'],
+                'estado_provincia' => $datos['estado_provincia'],
+                'fecha_nacimiento' => now()->subYears(35 + $indice)->subDays(11)->toDateString(),
+                'biografia' => $datos['biografia'],
+                'verificado' => $indice !== 1,
+                'deleted_at' => null,
+            ])->save();
 
             $user->vincularPerfil($vendedor);
         }

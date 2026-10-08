@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Models\Cita;
 use App\Models\Cliente;
+use App\Models\Contacto;
 use App\Models\Hilo;
 use App\Models\Inmobiliaria;
 use App\Models\Interes;
@@ -15,11 +16,13 @@ use App\Models\User;
 use App\Models\Vendedor;
 use App\Policies\CitaPolicy;
 use App\Policies\ClientePolicy;
+use App\Policies\ContactoPolicy;
 use App\Policies\HiloPolicy;
 use App\Policies\InmobiliariaPolicy;
 use App\Policies\InteresPolicy;
 use App\Policies\PropiedadPolicy;
 use App\Policies\ReportePolicy;
+use App\Policies\UsuarioPolicy;
 use App\Policies\VendedorPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +30,10 @@ use Illuminate\Support\Str;
 
 /**
  * Registra policies y gates de la aplicación.
+ *
+ * El panel de administración (rol `administrador`) se autoriza con
+ * `UsuarioPolicy`, `ContactoPolicy` y las abilities `gestionar`/`verificar`/
+ * `moderar` de las policies de cada recurso.
  */
 final class AuthServiceProvider extends ServiceProvider
 {
@@ -45,6 +52,8 @@ final class AuthServiceProvider extends ServiceProvider
         Inmobiliaria::class => InmobiliariaPolicy::class,
         Vendedor::class => VendedorPolicy::class,
         Cliente::class => ClientePolicy::class,
+        Contacto::class => ContactoPolicy::class,
+        User::class => UsuarioPolicy::class,
     ];
 
     /**

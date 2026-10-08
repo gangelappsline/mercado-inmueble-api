@@ -69,6 +69,17 @@ class UserFactory extends Factory
     }
 
     /**
+     * Crea el usuario con rol `administrador` (agente de la plataforma).
+     *
+     * Las cuentas administrativas no tienen perfil extendido: `perfil_type` y
+     * `perfil_id` quedan en null.
+     */
+    public function administrador(): static
+    {
+        return $this->state(fn (): array => ['role' => Role::Administrador]);
+    }
+
+    /**
      * Crea el usuario con rol `inmobiliaria` y su perfil extendido.
      */
     public function inmobiliaria(): static

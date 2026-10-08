@@ -46,39 +46,39 @@ class ClienteSeeder extends Seeder
             $numero = $indice + 1;
             $email = sprintf('cliente%d@demo.mercadoinmueble.com', $numero);
 
-            $user = User::withTrashed()->updateOrCreate(
-                ['email' => $email],
-                [
-                    'name' => $datos['name'],
-                    'password' => Hash::make(UserFactory::passwordDemo()),
-                    'role' => Role::Cliente,
-                    'phone' => sprintf('+591 7%06d', 400000 + $numero),
-                    'is_active' => true,
-                    'email_verified_at' => now(),
-                    'deleted_at' => null,
-                ],
-            );
+            $user = User::withTrashed()->firstOrNew(['email' => $email]);
 
-            $cliente = Cliente::withTrashed()->updateOrCreate(
-                ['user_id' => $user->getKey()],
-                [
-                    'telefono' => sprintf('+591 7%06d', 400000 + $numero),
-                    'presupuesto_min' => $datos['min'],
-                    'presupuesto_max' => $datos['max'],
-                    'moneda' => Moneda::Usd,
-                    'tipo_propiedad_interes' => $datos['tipo'],
-                    'ciudad_interes' => $datos['ciudad'],
-                    'habitaciones_min' => $datos['habitaciones'],
-                    'preferencias' => [
-                        'acepta_mascotas' => $indice % 3 === 0,
-                        'cerca_de_transporte' => $indice % 2 === 0,
-                        'con_estacionamiento' => $datos['habitaciones'] >= 2,
-                    ],
-                    'acepta_terminos' => true,
-                    'recibe_novedades' => $numero % 2 === 0,
-                    'deleted_at' => null,
+            // `forceFill`: email_verified_at y deleted_at no son fillable y la
+            // app evita el descarte silencioso de atributos.
+            $user->forceFill([
+                'name' => $datos['name'],
+                'password' => Hash::make(UserFactory::passwordDemo()),
+                'role' => Role::Cliente,
+                'phone' => sprintf('+591 7%06d', 400000 + $numero),
+                'is_active' => true,
+                'email_verified_at' => now(),
+                'deleted_at' => null,
+            ])->save();
+
+            $cliente = Cliente::withTrashed()->firstOrNew(['user_id' => $user->getKey()]);
+
+            $cliente->forceFill([
+                'telefono' => sprintf('+591 7%06d', 400000 + $numero),
+                'presupuesto_min' => $datos['min'],
+                'presupuesto_max' => $datos['max'],
+                'moneda' => Moneda::Usd,
+                'tipo_propiedad_interes' => $datos['tipo'],
+                'ciudad_interes' => $datos['ciudad'],
+                'habitaciones_min' => $datos['habitaciones'],
+                'preferencias' => [
+                    'acepta_mascotas' => $indice % 3 === 0,
+                    'cerca_de_transporte' => $indice % 2 === 0,
+                    'con_estacionamiento' => $datos['habitaciones'] >= 2,
                 ],
-            );
+                'acepta_terminos' => true,
+                'recibe_novedades' => $numero % 2 === 0,
+                'deleted_at' => null,
+            ])->save();
 
             $user->vincularPerfil($cliente);
         }

@@ -19,7 +19,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('hilo_id')->constrained('hilos')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->enum('rol_autor', Role::valores());
+            // Sólo los participantes de la conversación escriben mensajes:
+            // el rol `administrador` no participa en los hilos.
+            $table->enum('rol_autor', Role::valoresParticipantes())
+                ->comment('inmobiliaria | vendedor | cliente');
             $table->text('cuerpo');
             $table->string('adjunto', 2048)->nullable();
             $table->boolean('leido')->default(false);

@@ -50,30 +50,23 @@ final class AuthService
      *
      * @param  array<string, mixed>  $datos
      * @return array{user: User, tokens: array<string, mixed>}
+     *
+     * @throws BusinessException 403 cuando el rol no admite registro público.
      */
     public function registrar(Role $rol, array $datos): array
     {
-        $usuario = DB::transaction(function () use ($rol, $datos): User {
-            /** @var User $usuario */
-            $usuario = User::create([
-                'name' => $datos['name'],
-                'email' => $datos['email'],
-                'password' => $datos['password'],
-                'role' => $rol,
-                'phone' => $datos['phone'] ?? null,
-                'is_active' => true,
-            ]);
+        // Las cuentas de administrador se crean sólo desde el panel de
+        // administración (AdministracionService) o con `mercado:crear-admin`.
+        if (! $rol->permiteRegistroPublico()) {
+            throw new BusinessException(
+                __('messages.rol_no_registrable'),
+                [],
+                403,
+                'ROL_NO_REGISTRABLE',
+            );
+        }
 
-            $perfil = match ($rol) {
-                Role::Inmobiliaria => $this->crearInmobiliaria($usuario, $datos),
-                Role::Vendedor => $this->crearVendedor($usuario, $datos),
-                Role::Cliente => $this->crearCliente($usuario, $datos),
-            };
-
-            $usuario->vincularPerfil($perfil);
-
-            return $usuario;
-        });
+        $usuario = $this->crearCuenta($rol, $datos);
 
         $this->notificaciones->bienvenida($usuario->loadMissing('perfil'));
 
@@ -81,6 +74,45 @@ final class AuthService
             'user' => $usuario->loadMissing('perfil'),
             'tokens' => $this->emitirTokens($usuario, (string) $datos['password']),
         ];
+    }
+
+    /**
+     * Crea la cuenta y su perfil extendido en una transacción, sin emitir
+     * tokens ni notificar. Es el punto único de alta de cuentas: lo usan el
+     * registro público (`registrar()`) y el panel de administración
+     * (`AdministracionService::crearUsuario()`).
+     *
+     * Los administradores no tienen perfil extendido (`perfil_type`/`perfil_id`
+     * quedan en null).
+     *
+     * @param  array<string, mixed>  $datos
+     */
+    public function crearCuenta(Role $rol, array $datos): User
+    {
+        return DB::transaction(function () use ($rol, $datos): User {
+            /** @var User $usuario */
+            $usuario = User::create([
+                'name' => $datos['name'],
+                'email' => $datos['email'],
+                'password' => $datos['password'],
+                'role' => $rol,
+                'phone' => $datos['phone'] ?? null,
+                'is_active' => (bool) ($datos['is_active'] ?? true),
+            ]);
+
+            $perfil = match ($rol) {
+                Role::Inmobiliaria => $this->crearInmobiliaria($usuario, $datos),
+                Role::Vendedor => $this->crearVendedor($usuario, $datos),
+                Role::Cliente => $this->crearCliente($usuario, $datos),
+                Role::Administrador => null,
+            };
+
+            if ($perfil !== null) {
+                $usuario->vincularPerfil($perfil);
+            }
+
+            return $usuario;
+        });
     }
 
     /**

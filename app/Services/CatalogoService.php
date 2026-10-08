@@ -11,6 +11,7 @@ use App\Enums\EstadoPropiedad;
 use App\Enums\FormatoExportacion;
 use App\Enums\Moneda;
 use App\Enums\OperacionPropiedad;
+use App\Enums\Role;
 use App\Enums\TipoCita;
 use App\Enums\TipoPropiedad;
 use App\Enums\TipoReporte;
@@ -79,6 +80,7 @@ final class CatalogoService
                 'tipos_reporte' => TipoReporte::opciones(),
                 'categorias_amenidad' => CategoriaAmenidad::opciones(),
                 'formatos_exportacion' => FormatoExportacion::opciones(),
+                'roles' => Role::opcionesRegistrables(),
             ],
         );
     }
