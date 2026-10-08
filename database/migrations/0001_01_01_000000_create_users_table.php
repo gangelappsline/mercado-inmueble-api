@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * Usuarios de la plataforma. El perfil extendido (Inmobiliaria|Vendedor|Cliente)
- * se resuelve con la relación polimórfica `perfil` (perfil_type/perfil_id).
+ * se resuelve con la relación polimórfica `perfil` (perfil_type/perfil_id); las
+ * cuentas con rol `administrador` no tienen perfil extendido.
  */
 return new class extends Migration
 {
@@ -21,7 +22,8 @@ return new class extends Migration
             $table->string('email', 180)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->enum('role', Role::valores())->index()->comment('inmobiliaria | vendedor | cliente');
+            $table->enum('role', Role::valores())->index()
+                ->comment('inmobiliaria | vendedor | cliente | administrador');
             $table->string('phone', 30)->nullable();
             $table->string('avatar', 2048)->nullable();
             $table->nullableMorphs('perfil');

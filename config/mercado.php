@@ -80,6 +80,7 @@ return [
         'cliente' => (int) env('RATE_LIMIT_CLIENTE', 120),
         'vendedor' => (int) env('RATE_LIMIT_VENDEDOR', 240),
         'inmobiliaria' => (int) env('RATE_LIMIT_INMOBILIARIA', 480),
+        'administrador' => (int) env('RATE_LIMIT_ADMINISTRADOR', 600),
         'auth' => (int) env('RATE_LIMIT_AUTH', 10),
         'contacto' => (int) env('RATE_LIMIT_CONTACTO', 5),
         'docs' => (int) env('RATE_LIMIT_DOCS', 60),
@@ -124,6 +125,7 @@ return [
             'inmobiliaria' => 'Acceso al panel de inmobiliaria',
             'vendedor' => 'Acceso al panel de vendedor',
             'cliente' => 'Acceso al panel de cliente',
+            'administrador' => 'Acceso al panel de administración (gestión de cuentas, anunciantes y moderación)',
             'propiedades:leer' => 'Consultar propiedades (incluye datos de contacto)',
             'propiedades:escribir' => 'Crear, actualizar y eliminar propiedades',
             'citas:leer' => 'Consultar la agenda de citas',
@@ -132,6 +134,8 @@ return [
             'mensajes:escribir' => 'Responder en los hilos de mensajes',
             'reportes:leer' => 'Consultar reportes y métricas',
             'perfil:escribir' => 'Actualizar el perfil del usuario',
+            'admin:usuarios' => 'Gestionar las cuentas de la plataforma',
+            'admin:moderacion' => 'Moderar anunciantes y publicaciones',
         ],
     ],
 
@@ -160,6 +164,38 @@ return [
         'email_admin' => env('MERCADO_EMAIL_ADMIN', 'soporte@mercadoinmueble.com'),
         'encolar' => (bool) env('MERCADO_NOTIFICACIONES_ENCOLAR', true),
         'canal_database' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Panel de administración (rol `administrador`)
+    |--------------------------------------------------------------------------
+    | Los agentes de la plataforma gestionan inmobiliarias, vendedores,
+    | clientes, publicaciones y los mensajes del formulario de contacto.
+    |
+    | La cuenta inicial se crea con `php artisan mercado:instalar` (o con
+    | `php artisan mercado:crear-admin {correo}`); nunca por el registro
+    | público de la API.
+    */
+    'admin' => [
+        // Correo de la cuenta que crea el instalador.
+        'email' => env('ADMIN_EMAIL', 'admin@mercadoinmueble.com'),
+        'nombre' => env('ADMIN_NOMBRE', 'Administrador Mercado Inmueble'),
+
+        // Sin contraseña explícita el instalador genera una aleatoria y la
+        // imprime una única vez (no queda almacenada en texto plano).
+        'password' => env('ADMIN_PASSWORD'),
+
+        'crear_en_instalacion' => (bool) env('ADMIN_CREAR_EN_INSTALACION', true),
+
+        // Reglas de protección del propio panel.
+        'reglas' => [
+            // Siempre debe quedar al menos un administrador activo: impide
+            // desactivar, degradar o eliminar la última cuenta con acceso.
+            'minimo_administradores_activos' => 1,
+            // Al desactivar una cuenta se revocan todos sus tokens.
+            'revocar_tokens_al_desactivar' => true,
+        ],
     ],
 
 ];

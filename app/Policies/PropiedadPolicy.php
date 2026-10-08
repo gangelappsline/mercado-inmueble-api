@@ -10,16 +10,17 @@ use App\Models\User;
 
 /**
  * Autorización de las propiedades: cada anunciante administra únicamente sus
- * publicaciones; los clientes nunca acceden al panel.
+ * publicaciones, los clientes nunca acceden al panel y el rol `administrador`
+ * modera cualquier publicación de la plataforma.
  */
 class PropiedadPolicy
 {
     /**
-     * Listar el propio listado del panel.
+     * Listar el propio listado del panel (o el global en moderación).
      */
     public function viewAny(User $user): bool
     {
-        return $user->publicaPropiedades();
+        return $user->publicaPropiedades() || $user->esAdministrador();
     }
 
     /**
@@ -27,7 +28,16 @@ class PropiedadPolicy
      */
     public function view(User $user, Propiedad $propiedad): bool
     {
-        return $this->owns($user, $propiedad);
+        return $this->owns($user, $propiedad) || $user->esAdministrador();
+    }
+
+    /**
+     * Moderación administrativa: destacar, pausar, publicar, rechazar o dar de
+     * baja cualquier publicación, sin importar su anunciante.
+     */
+    public function moderar(User $user, Propiedad $propiedad): bool
+    {
+        return $user->esAdministrador();
     }
 
     /**
@@ -83,15 +93,18 @@ class PropiedadPolicy
      */
     public function restore(User $user, Propiedad $propiedad): bool
     {
-        return $user->esInmobiliaria() && $this->owns($user, $propiedad);
+        return $user->esAdministrador()
+            || ($user->esInmobiliaria() && $this->owns($user, $propiedad));
     }
 
     /**
-     * Destacar/retirar destacado: exclusivo de inmobiliarias.
+     * Destacar/retirar destacado: inmobiliarias sobre sus publicaciones y el
+     * panel de administración sobre cualquiera.
      */
     public function destacar(User $user, Propiedad $propiedad): bool
     {
-        return $user->esInmobiliaria() && $this->owns($user, $propiedad);
+        return $user->esAdministrador()
+            || ($user->esInmobiliaria() && $this->owns($user, $propiedad));
     }
 
     /**
@@ -99,7 +112,7 @@ class PropiedadPolicy
      */
     public function verEstadisticas(User $user, Propiedad $propiedad): bool
     {
-        return $this->owns($user, $propiedad);
+        return $this->owns($user, $propiedad) || $user->esAdministrador();
     }
 
     /**

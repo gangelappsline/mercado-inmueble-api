@@ -8,11 +8,36 @@ use App\Models\User;
 use App\Models\Vendedor;
 
 /**
- * Autorización del perfil de vendedor: la ficha pública es visible; sólo el
- * propio vendedor edita sus datos y su fotografía.
+ * Autorización del perfil de vendedor: la ficha pública es visible, sólo el
+ * propio vendedor edita sus datos y su fotografía, y el panel de
+ * administración (rol `administrador`) los gestiona y verifica.
  */
 class VendedorPolicy
 {
+    /**
+     * Listado administrativo de vendedores (panel de administración).
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->esAdministrador();
+    }
+
+    /**
+     * Gestión administrativa de la cuenta (suspender, verificar, métricas).
+     */
+    public function gestionar(User $user, Vendedor $vendedor): bool
+    {
+        return $user->esAdministrador();
+    }
+
+    /**
+     * Verificar (o retirar la verificación de) un vendedor.
+     */
+    public function verificar(User $user, Vendedor $vendedor): bool
+    {
+        return $user->esAdministrador();
+    }
+
     /**
      * Ver la ficha pública del vendedor.
      */
@@ -38,11 +63,12 @@ class VendedorPolicy
     }
 
     /**
-     * Ver las métricas del vendedor propio.
+     * Ver las métricas del vendedor propio (o de cualquiera desde el panel de
+     * administración).
      */
     public function verEstadisticas(User $user, Vendedor $vendedor): bool
     {
-        return $this->owns($user, $vendedor);
+        return $this->owns($user, $vendedor) || $user->esAdministrador();
     }
 
     /**

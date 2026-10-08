@@ -16,7 +16,8 @@ use Throwable;
  *
  * Ejecuta en orden: APP_KEY, claves de Passport, migraciones, enlace de
  * storage, clientes OAuth first-party (escribiendo las credenciales en el
- * `.env`) y, opcionalmente, los datos de demostración.
+ * `.env`), la cuenta de administración y, opcionalmente, los datos de
+ * demostración.
  */
 class InstalarMercadoCommand extends Command
 {
@@ -44,6 +45,7 @@ class InstalarMercadoCommand extends Command
         $this->prepararBaseDeDatos();
         $this->prepararStorage();
         $this->prepararPassport($auth);
+        $this->prepararAdministrador();
 
         $catalogo->olvidar();
 
@@ -127,6 +129,26 @@ class InstalarMercadoCommand extends Command
     }
 
     /**
+     * Crea la primera cuenta de administración (rol `administrador`).
+     *
+     * El registro público de la API no permite crear administradores: sin este
+     * paso el panel `/api/v1/admin/*` quedaría inaccesible.
+     */
+    private function prepararAdministrador(): void
+    {
+        if (! (bool) config('mercado.admin.crear_en_instalacion', true)) {
+            return;
+        }
+
+        $this->components->task('Creando la cuenta de administración', fn (): int => $this->call('mercado:crear-admin', [
+            'email' => (string) config('mercado.admin.email'),
+            '--nombre' => (string) config('mercado.admin.nombre'),
+            '--password' => filled(config('mercado.admin.password')) ? (string) config('mercado.admin.password') : null,
+            '--force' => true,
+        ]));
+    }
+
+    /**
      * Escribe (o reemplaza) variables en el archivo `.env`.
      *
      * @param  array<string, string>  $valores
@@ -164,8 +186,14 @@ class InstalarMercadoCommand extends Command
         $this->newLine();
         $this->info('✅ Instalación completada.');
 
+        $this->line(sprintf(
+            '   Cuenta de administración: %s (rol administrador → /api/v1/admin/*)',
+            (string) config('mercado.admin.email'),
+        ));
+
         if ($this->option('seed')) {
             $this->line('   Cuentas demo (contraseña: '.UserFactory::PASSWORD_DEMO.'):');
+            $this->line('   • admin@demo.mercadoinmueble.com y agente1@demo.mercadoinmueble.com');
             $this->line('   • inmobiliaria1@demo.mercadoinmueble.com … inmobiliaria5@demo.mercadoinmueble.com');
             $this->line('   • vendedor1@demo.mercadoinmueble.com … vendedor3@demo.mercadoinmueble.com');
             $this->line('   • cliente1@demo.mercadoinmueble.com … cliente10@demo.mercadoinmueble.com');
@@ -176,5 +204,6 @@ class InstalarMercadoCommand extends Command
         $this->line('   1. php artisan serve  (o configura tu servidor web)');
         $this->line('   2. Documentación OpenAPI: /docs/api');
         $this->line('   3. Generar el contrato: php artisan openapi');
+        $this->line('   4. Crear más agentes: php artisan mercado:crear-admin {correo}');
     }
 }

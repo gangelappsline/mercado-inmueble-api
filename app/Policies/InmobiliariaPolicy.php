@@ -9,10 +9,27 @@ use App\Models\User;
 
 /**
  * Autorización del perfil de inmobiliaria: la ficha pública es visible para
- * cualquiera y sólo el propio usuario edita sus datos y su logotipo.
+ * cualquiera, sólo el propio usuario edita sus datos y su logotipo, y el panel
+ * de administración (rol `administrador`) las gestiona y verifica.
  */
 class InmobiliariaPolicy
 {
+    /**
+     * Listado administrativo de inmobiliarias (panel de administración).
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->esAdministrador();
+    }
+
+    /**
+     * Gestión administrativa de la cuenta (suspender, verificar, métricas).
+     */
+    public function gestionar(User $user, Inmobiliaria $inmobiliaria): bool
+    {
+        return $user->esAdministrador();
+    }
+
     /**
      * Ver la ficha pública de la inmobiliaria (catálogo de anunciantes).
      */
@@ -46,19 +63,21 @@ class InmobiliariaPolicy
     }
 
     /**
-     * Ver las métricas agregadas de la inmobiliaria propia.
+     * Ver las métricas agregadas de la inmobiliaria propia (o de cualquiera
+     * desde el panel de administración).
      */
     public function verEstadisticas(User $user, Inmobiliaria $inmobiliaria): bool
     {
-        return $this->owns($user, $inmobiliaria);
+        return $this->owns($user, $inmobiliaria) || $user->esAdministrador();
     }
 
     /**
-     * Verificar una inmobiliaria: reservado al panel administrativo.
+     * Verificar (o retirar la verificación de) una inmobiliaria: reservado al
+     * panel de administración.
      */
     public function verificar(User $user, Inmobiliaria $inmobiliaria): bool
     {
-        return false;
+        return $user->esAdministrador();
     }
 
     /**

@@ -13,12 +13,15 @@ declare(strict_types=1);
 |
 | Convenciones:
 | - `auth:api`  exige token válido; `activo` bloquea cuentas desactivadas;
-|   `role:...` restringe el panel por rol.
+|   `role:...` restringe el panel por rol (`inmobiliaria`, `vendedor`,
+|   `cliente`, `administrador`).
 | - `throttle:auth` y `throttle:contacto` limitan los endpoints sensibles.
 | - Las descargas de archivos privados van firmadas (middleware `signed`).
 |
 */
 
+use App\Enums\Role;
+use App\Http\Controllers\Api\Admin as AdminApi;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Cliente as ClienteApi;
 use App\Http\Controllers\Api\Inmobiliaria as InmobiliariaApi;
@@ -39,8 +42,10 @@ Route::get('/health', function(){
     |----------------------------------------------------------------------
     */
     Route::prefix('auth')->middleware('throttle:auth')->group(function (): void {
+        // Los roles registrables los define el enum: `administrador` queda
+        // fuera (sus cuentas se crean desde /admin/usuarios o por consola).
         Route::post('register/{rol}', [AuthController::class, 'registrar'])
-            ->whereIn('rol', ['inmobiliaria', 'vendedor', 'cliente'])
+            ->whereIn('rol', Role::valoresRegistrables())
             ->name('auth.register');
 
         Route::post('login', [AuthController::class, 'login'])->name('auth.login');
@@ -167,6 +172,71 @@ Route::get('/health', function(){
     Route::prefix('vendedor')
         ->middleware(['auth:api', 'activo'])
         ->group(static fn () => $panel(VendedorApi::class, 'vendedor'));
+
+    /*
+    |----------------------------------------------------------------------
+    | Panel de administración (rol `administrador`)
+    |----------------------------------------------------------------------
+    | Agentes de la plataforma: gestionan las cuentas (incluidas las de otros
+    | administradores), verifican inmobiliarias y vendedores, moderan el
+    | catálogo completo, atienden la bandeja de contacto y consultan la
+    | bitácora de auditoría.
+    |
+    | Reglas del panel: ninguna acción se aplica sobre la cuenta propia y
+    | siempre debe quedar al menos un administrador activo.
+    */
+    Route::prefix('admin')
+        ->middleware(['auth:api', 'activo', 'role:administrador'])
+        ->group(function (): void {
+            // Dashboard y perfil del agente
+            Route::get('dashboard', [AdminApi\DashboardController::class, 'resumen'])->name('admin.dashboard');
+            Route::get('perfil', [AdminApi\PerfilController::class, 'show'])->name('admin.perfil.show');
+            Route::match(['put', 'patch'], 'perfil', [AdminApi\PerfilController::class, 'actualizar'])->name('admin.perfil.update');
+
+            // Cuentas de la plataforma
+            Route::get('usuarios', [AdminApi\UsuarioController::class, 'index'])->name('admin.usuarios.index');
+            Route::post('usuarios', [AdminApi\UsuarioController::class, 'store'])->name('admin.usuarios.store');
+            Route::get('usuarios/{usuario}', [AdminApi\UsuarioController::class, 'show'])->name('admin.usuarios.show');
+            Route::match(['put', 'patch'], 'usuarios/{usuario}', [AdminApi\UsuarioController::class, 'update'])->name('admin.usuarios.update');
+            Route::patch('usuarios/{usuario}/rol', [AdminApi\UsuarioController::class, 'cambiarRol'])->name('admin.usuarios.rol');
+            Route::patch('usuarios/{usuario}/activar', [AdminApi\UsuarioController::class, 'activar'])->name('admin.usuarios.activar');
+            Route::patch('usuarios/{usuario}/desactivar', [AdminApi\UsuarioController::class, 'desactivar'])->name('admin.usuarios.desactivar');
+            Route::patch('usuarios/{usuario}/restaurar', [AdminApi\UsuarioController::class, 'restaurar'])->withTrashed()->name('admin.usuarios.restaurar');
+            Route::delete('usuarios/{usuario}', [AdminApi\UsuarioController::class, 'destroy'])->name('admin.usuarios.destroy');
+
+            // Inmobiliarias
+            Route::get('inmobiliarias', [AdminApi\InmobiliariaController::class, 'index'])->name('admin.inmobiliarias.index');
+            Route::get('inmobiliarias/{inmobiliaria}', [AdminApi\InmobiliariaController::class, 'show'])->name('admin.inmobiliarias.show');
+            Route::post('inmobiliarias/{inmobiliaria}/verificar', [AdminApi\InmobiliariaController::class, 'verificar'])->name('admin.inmobiliarias.verificar');
+            Route::delete('inmobiliarias/{inmobiliaria}/verificar', [AdminApi\InmobiliariaController::class, 'retirarVerificacion'])->name('admin.inmobiliarias.desverificar');
+
+            // Vendedores
+            Route::get('vendedores', [AdminApi\VendedorController::class, 'index'])->name('admin.vendedores.index');
+            Route::get('vendedores/{vendedor}', [AdminApi\VendedorController::class, 'show'])->name('admin.vendedores.show');
+            Route::post('vendedores/{vendedor}/verificar', [AdminApi\VendedorController::class, 'verificar'])->name('admin.vendedores.verificar');
+            Route::delete('vendedores/{vendedor}/verificar', [AdminApi\VendedorController::class, 'retirarVerificacion'])->name('admin.vendedores.desverificar');
+
+            // Moderación del catálogo
+            Route::get('propiedades', [AdminApi\PropiedadController::class, 'index'])->name('admin.propiedades.index');
+            Route::get('propiedades/{propiedad}', [AdminApi\PropiedadController::class, 'show'])->name('admin.propiedades.show');
+            Route::post('propiedades/{propiedad}/destacar', [AdminApi\PropiedadController::class, 'destacar'])->name('admin.propiedades.destacar');
+            Route::delete('propiedades/{propiedad}/destacar', [AdminApi\PropiedadController::class, 'retirarDestacado'])->name('admin.propiedades.desdestacar');
+            Route::post('propiedades/{propiedad}/publicar', [AdminApi\PropiedadController::class, 'publicar'])->name('admin.propiedades.publicar');
+            Route::post('propiedades/{propiedad}/pausar', [AdminApi\PropiedadController::class, 'pausar'])->name('admin.propiedades.pausar');
+            Route::post('propiedades/{propiedad}/rechazar', [AdminApi\PropiedadController::class, 'rechazar'])->name('admin.propiedades.rechazar');
+            Route::patch('propiedades/{propiedad}/restaurar', [AdminApi\PropiedadController::class, 'restaurar'])->withTrashed()->name('admin.propiedades.restaurar');
+            Route::delete('propiedades/{propiedad}', [AdminApi\PropiedadController::class, 'destroy'])->name('admin.propiedades.destroy');
+
+            // Bandeja de contacto (formulario público)
+            Route::get('contactos', [AdminApi\ContactoController::class, 'index'])->name('admin.contactos.index');
+            Route::get('contactos/{contacto}', [AdminApi\ContactoController::class, 'show'])->name('admin.contactos.show');
+            Route::patch('contactos/{contacto}/atender', [AdminApi\ContactoController::class, 'atender'])->name('admin.contactos.atender');
+            Route::delete('contactos/{contacto}', [AdminApi\ContactoController::class, 'destroy'])->name('admin.contactos.destroy');
+
+            // Bitácora de auditoría
+            Route::get('actividad', [AdminApi\ActividadController::class, 'index'])->name('admin.actividad.index');
+            Route::get('actividad/{actividad}', [AdminApi\ActividadController::class, 'show'])->name('admin.actividad.show');
+        });
 
     /*
     |----------------------------------------------------------------------

@@ -48,9 +48,16 @@ return [
         `refresh_token` para obtener un par nuevo (rotación de refresh tokens).
 
         ### Roles
-        La API expone tres paneles: `/api/v1/inmobiliaria/*`, `/api/v1/vendedor/*`
-        y `/api/v1/cliente/*`. Cada grupo exige el rol correspondiente mediante el
-        middleware `role:{rol}`.
+        La API expone cuatro paneles: `/api/v1/inmobiliaria/*`, `/api/v1/vendedor/*`,
+        `/api/v1/cliente/*` y `/api/v1/admin/*`. Cada grupo exige el rol
+        correspondiente mediante el middleware `role:{rol}`.
+
+        El rol `administrador` opera la plataforma: gestiona las cuentas (altas,
+        suspensiones y cambios de rol), verifica inmobiliarias y vendedores,
+        modera cualquier publicación, atiende los mensajes de contacto y
+        consulta la bitácora de auditoría. Sus cuentas no se crean por
+        `POST /auth/register/{rol}`: usa `php artisan mercado:crear-admin {correo}`
+        o `POST /api/v1/admin/usuarios`.
 
         ### Errores
         Formato uniforme:
@@ -60,8 +67,8 @@ return [
 
         ### Rate limiting
         El límite por minuto depende del rol: invitado 60, cliente 120,
-        vendedor 240, inmobiliaria 480. Las cabeceras `X-RateLimit-*` informan
-        el consumo restante.
+        vendedor 240, inmobiliaria 480, administrador 600. Las cabeceras
+        `X-RateLimit-*` informan el consumo restante.
         MD,
     ],
 

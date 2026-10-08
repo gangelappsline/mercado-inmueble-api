@@ -100,6 +100,38 @@ final class PropiedadRepository implements PropiedadRepositoryInterface
     /**
      * {@inheritDoc}
      */
+    public function listarParaAdministracion(array $filtros = [], int $porPagina = 15): LengthAwarePaginator
+    {
+        $query = Propiedad::query()
+            ->with(['fotoPrincipal', 'propietario', 'video'])
+            ->withCount(['intereses', 'citas', 'favoritos']);
+
+        $this->aplicarFiltros($query, $filtros, publicas: false);
+
+        if (filled($filtros['estado'] ?? null)) {
+            $query->where('estado', $filtros['estado']);
+        }
+
+        if (filled($filtros['propietario_tipo'] ?? null)) {
+            $query->where('propietario_type', (string) $filtros['propietario_tipo']);
+        }
+
+        if (filled($filtros['propietario_id'] ?? null)) {
+            $query->where('propietario_id', (int) $filtros['propietario_id']);
+        }
+
+        $query->orderByDesc('destacada')
+            ->ordenar($this->cadena($filtros['orden'] ?? null) ?? 'recientes');
+
+        return $query->paginate(
+            perPage: $porPagina,
+            page: $this->entero($filtros['page'] ?? null, 1),
+        )->withQueryString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function destacadas(int $limite = 8): Collection
     {
         return Propiedad::query()
@@ -159,6 +191,32 @@ final class PropiedadRepository implements PropiedadRepositoryInterface
         }
 
         $resumen['total'] = $total;
+
+        return $resumen;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resumenGlobalPorEstado(): array
+    {
+        $conteos = Propiedad::query()
+            ->selectRaw('estado, COUNT(*) as total')
+            ->groupBy('estado')
+            ->pluck('total', 'estado')
+            ->all();
+
+        $resumen = [];
+        $total = 0;
+
+        foreach (EstadoPropiedad::cases() as $estado) {
+            $cantidad = (int) ($conteos[$estado->value] ?? 0);
+            $resumen[$estado->value] = $cantidad;
+            $total += $cantidad;
+        }
+
+        $resumen['total'] = $total;
+        $resumen['destacadas'] = Propiedad::query()->destacadas()->count();
 
         return $resumen;
     }

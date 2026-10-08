@@ -14,6 +14,7 @@ use App\Models\Reporte;
 use App\Models\User;
 use App\Models\Vendedor;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -101,6 +102,7 @@ class EstadoMercadoCommand extends Command
     {
         $this->table(['Entidad', 'Registros'], [
             ['Usuarios', $this->contar(User::class)],
+            ['Administradores', $this->contar(User::class, static fn (Builder $query): Builder => $query->administradores()->activos())],
             ['Inmobiliarias', $this->contar(Inmobiliaria::class)],
             ['Vendedores', $this->contar(Vendedor::class)],
             ['Propiedades', $this->contar(Propiedad::class)],
@@ -117,11 +119,18 @@ class EstadoMercadoCommand extends Command
      * Cuenta registros de un modelo, devolviendo "error" si la tabla no existe.
      *
      * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelo
+     * @param  (callable(Builder): Builder)|null  $filtro  Ámbito adicional (p. ej. sólo administradores).
      */
-    private function contar(string $modelo): string
+    private function contar(string $modelo, ?callable $filtro = null): string
     {
         try {
-            return (string) $modelo::query()->count();
+            $consulta = $modelo::query();
+
+            if ($filtro !== null) {
+                $consulta = $filtro($consulta);
+            }
+
+            return (string) $consulta->count();
         } catch (Throwable) {
             return 'sin tabla (¿migraste?)';
         }

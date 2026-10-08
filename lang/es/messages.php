@@ -42,6 +42,7 @@ return [
     'registro_exitoso' => 'Registro completado. Ya puede iniciar sesión.',
     'correo_enviado' => 'Si el correo está registrado, recibirá las instrucciones para restablecer su contraseña.',
     'password_restablecido' => 'Contraseña restablecida correctamente.',
+    'rol_no_registrable' => 'Ese rol no admite registro público. Solicite la cuenta a un administrador.',
 
     // ─── Propiedades ──────────────────────────────────────────────────────
     'propiedad_no_encontrada' => 'La propiedad solicitada no existe o no está visible.',
@@ -98,5 +99,28 @@ return [
     'contacto_recibido' => 'Gracias por escribirnos. Responderemos a la brevedad.',
     'reporte_generado' => 'Reporte generado correctamente.',
     'sin_datos' => 'No hay datos para los filtros seleccionados.',
+
+    // ─── Panel de administración ──────────────────────────────────────────
+    'admin_usuario_no_encontrado' => 'La cuenta solicitada no existe.',
+    'admin_usuario_creado' => 'Cuenta creada correctamente.',
+    'admin_usuario_actualizado' => 'Cuenta actualizada correctamente.',
+    'admin_usuario_activado' => 'La cuenta fue activada.',
+    'admin_usuario_desactivado' => 'La cuenta fue desactivada y sus sesiones revocadas.',
+    'admin_usuario_eliminado' => 'La cuenta fue dada de baja.',
+    'admin_usuario_restaurado' => 'La cuenta fue restaurada.',
+    'admin_rol_actualizado' => 'El rol de la cuenta fue actualizado.',
+    'admin_rol_sin_perfil' => 'La cuenta no tiene el perfil extendido del rol indicado. Cree la cuenta con el registro correspondiente.',
+    'admin_rol_sin_cambio' => 'La cuenta ya tiene ese rol.',
+    'admin_auto_modificacion' => 'No puede aplicar esta acción sobre su propia cuenta.',
+    'admin_ultimo_administrador' => 'Debe quedar al menos un administrador activo en la plataforma.',
+    'admin_perfil_no_encontrado' => 'El perfil solicitado no existe.',
+    'admin_verificacion_otorgada' => 'La cuenta quedó verificada.',
+    'admin_verificacion_retirada' => 'Se retiró la verificación de la cuenta.',
+    'admin_propiedad_destacada' => 'La publicación quedó destacada en la portada.',
+    'admin_destacado_retirado' => 'Se retiró el destacado de la publicación.',
+    'admin_propiedad_moderada' => 'La publicación fue moderada correctamente.',
+    'admin_propiedad_ya_rechazada' => 'La publicación ya se encuentra rechazada.',
+    'admin_contacto_atendido' => 'El mensaje de contacto quedó marcado como atendido.',
+    'admin_actividad_no_encontrada' => 'El registro de actividad solicitado no existe.',
 
 ];

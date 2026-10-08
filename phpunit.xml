@@ -38,6 +38,7 @@
         <env name="RATE_LIMIT_CLIENTE" value="1000"/>
         <env name="RATE_LIMIT_VENDEDOR" value="1000"/>
         <env name="RATE_LIMIT_INMOBILIARIA" value="1000"/>
+        <env name="RATE_LIMIT_ADMINISTRADOR" value="1000"/>
         <env name="RATE_LIMIT_AUTH" value="1000"/>
         <env name="RATE_LIMIT_CONTACTO" value="1000"/>
     </php>

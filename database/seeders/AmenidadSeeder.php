@@ -78,17 +78,18 @@ class AmenidadSeeder extends Seeder
 
         foreach (self::CATALOGO as $categoria => $amenidades) {
             foreach ($amenidades as $nombre => $icono) {
-                Amenidad::updateOrCreate(
-                    ['slug' => Str::slug($nombre)],
-                    [
-                        'nombre' => $nombre,
-                        'icono' => $icono,
-                        'categoria' => CategoriaAmenidad::from($categoria),
-                        'activa' => true,
-                        'orden' => $orden,
-                        'deleted_at' => null,
-                    ],
-                );
+                $amenidad = Amenidad::withTrashed()->firstOrNew(['slug' => Str::slug($nombre)]);
+
+                // `forceFill`: `deleted_at` no es un atributo fillable y la app
+                // evita el descarte silencioso de atributos.
+                $amenidad->forceFill([
+                    'nombre' => $nombre,
+                    'icono' => $icono,
+                    'categoria' => CategoriaAmenidad::from($categoria),
+                    'activa' => true,
+                    'orden' => $orden,
+                    'deleted_at' => null,
+                ])->save();
 
                 $orden++;
             }

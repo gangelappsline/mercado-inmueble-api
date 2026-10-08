@@ -81,37 +81,37 @@ class InmobiliariaSeeder extends Seeder
     public function run(): void
     {
         foreach (self::INMOBILIARIAS as $indice => $datos) {
-            $user = User::withTrashed()->updateOrCreate(
-                ['email' => $datos['email']],
-                [
-                    'name' => $datos['name'],
-                    'password' => Hash::make(UserFactory::passwordDemo()),
-                    'role' => Role::Inmobiliaria,
-                    'phone' => sprintf('+591 7%06d', 100000 + $indice),
-                    'is_active' => true,
-                    'email_verified_at' => now(),
-                    'deleted_at' => null,
-                ],
-            );
+            $user = User::withTrashed()->firstOrNew(['email' => $datos['email']]);
 
-            $inmobiliaria = Inmobiliaria::withTrashed()->updateOrCreate(
-                ['ruc' => sprintf('10%08d', 25000000 + $indice)],
-                [
-                    'user_id' => $user->getKey(),
-                    'razon_social' => $datos['razon_social'],
-                    'nombre_comercial' => $datos['nombre_comercial'],
-                    'direccion' => 'Av. Central #'.(100 + $indice).', '.$datos['ciudad'],
-                    'telefono' => sprintf('+591 3%07d', 3000000 + $indice),
-                    'telefono_alternativo' => sprintf('+591 7%06d', 200000 + $indice),
-                    'web' => $datos['web'],
-                    'descripcion' => $datos['descripcion'],
-                    'ciudad' => $datos['ciudad'],
-                    'estado_provincia' => $datos['estado_provincia'],
-                    'pais' => 'Bolivia',
-                    'verificado' => $indice < 3,
-                    'deleted_at' => null,
-                ],
-            );
+            // `forceFill`: email_verified_at y deleted_at no son fillable y la
+            // app evita el descarte silencioso de atributos.
+            $user->forceFill([
+                'name' => $datos['name'],
+                'password' => Hash::make(UserFactory::passwordDemo()),
+                'role' => Role::Inmobiliaria,
+                'phone' => sprintf('+591 7%06d', 100000 + $indice),
+                'is_active' => true,
+                'email_verified_at' => now(),
+                'deleted_at' => null,
+            ])->save();
+
+            $inmobiliaria = Inmobiliaria::withTrashed()->firstOrNew(['ruc' => sprintf('10%08d', 25000000 + $indice)]);
+
+            $inmobiliaria->forceFill([
+                'user_id' => $user->getKey(),
+                'razon_social' => $datos['razon_social'],
+                'nombre_comercial' => $datos['nombre_comercial'],
+                'direccion' => 'Av. Central #'.(100 + $indice).', '.$datos['ciudad'],
+                'telefono' => sprintf('+591 3%07d', 3000000 + $indice),
+                'telefono_alternativo' => sprintf('+591 7%06d', 200000 + $indice),
+                'web' => $datos['web'],
+                'descripcion' => $datos['descripcion'],
+                'ciudad' => $datos['ciudad'],
+                'estado_provincia' => $datos['estado_provincia'],
+                'pais' => 'Bolivia',
+                'verificado' => $indice < 3,
+                'deleted_at' => null,
+            ])->save();
 
             $user->vincularPerfil($inmobiliaria);
         }
