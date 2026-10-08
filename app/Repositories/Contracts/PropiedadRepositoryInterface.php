@@ -41,6 +41,11 @@ interface PropiedadRepositoryInterface
     public function destacadas(int $limite = 8): Collection;
 
     /**
+     * Carga las relaciones y contadores del detalle de una propiedad.
+     */
+    public function detalle(Propiedad $propiedad): Propiedad;
+
+    /**
      * Propiedades similares (misma ciudad, tipo y operación, rango de precio).
      *
      * @return Collection<int, Propiedad>
